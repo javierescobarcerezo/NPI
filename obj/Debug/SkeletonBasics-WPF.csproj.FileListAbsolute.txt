@@ -18,3 +18,5 @@ C:\Informatica\NPI\Movimiento32\Movimiento-32\obj\Debug\Microsoft.Samples.Kinect
 C:\Informatica\NPI\Movimiento32\Movimiento-32\obj\Debug\SkeletonBasics-WPF.csproj.GenerateResource.Cache
 C:\Informatica\NPI\Movimiento32\Movimiento-32\obj\Debug\SkeletonBasics-WPF.exe
 C:\Informatica\NPI\Movimiento32\Movimiento-32\obj\Debug\SkeletonBasics-WPF.pdb
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.exe
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.pdb
