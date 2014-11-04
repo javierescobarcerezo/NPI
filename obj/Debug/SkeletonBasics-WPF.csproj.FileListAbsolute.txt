@@ -20,3 +20,13 @@ C:\Informatica\NPI\Movimiento32\Movimiento-32\obj\Debug\SkeletonBasics-WPF.exe
 C:\Informatica\NPI\Movimiento32\Movimiento-32\obj\Debug\SkeletonBasics-WPF.pdb
 C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.exe
 C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.pdb
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.csprojResolveAssemblyReference.cache
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\MainWindow.baml
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\MainWindow.g.cs
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\App.g.cs
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF_MarkupCompile.cache
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.g.resources
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\Microsoft.Samples.Kinect.SkeletonBasics.Properties.Resources.resources
+C:\Informatica\NPI\Practica2\NPI\obj\Debug\SkeletonBasics-WPF.csproj.GenerateResource.Cache
+C:\Informatica\NPI\Practica2\NPI\bin\Debug\SkeletonBasics-WPF.exe
+C:\Informatica\NPI\Practica2\NPI\bin\Debug\SkeletonBasics-WPF.pdb

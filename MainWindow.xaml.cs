@@ -18,16 +18,45 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     public partial class MainWindow : Window
     {
         private readonly Pen penCorrecto = new Pen(Brushes.Green, 6);
+        private readonly Brush puntoVerde = Brushes.GreenYellow;
+
         private readonly Pen penTranscurso = new Pen(Brushes.Yellow, 6);
+        private readonly Brush puntoAmarillo = Brushes.Yellow;
+
         private readonly Pen penInicio = new Pen(Brushes.Cyan, 6);
+        private readonly Brush puntoCyan = Brushes.Cyan;
+
+
         private readonly Pen penError = new Pen(Brushes.Red, 6);
+        private readonly Brush puntoRojo = Brushes.Red;
+
+
         private readonly Pen drawPen = new Pen(Brushes.Blue, 6);
 
+        //Fases de un movimiento
         private bool inicio = true;
         private bool transcurso = false;
         private bool completado = false;
+
+        /// <summary>
+        /// Acumulador provisional para asegurar que una postura se mantiene durante un tiempo
+        /// </summary>
         private int acumulador = 0;
+
+        /// <summary>
+        /// Variable para guardar puntos de referencia (provisional)
+        /// </summary>
         private float referencia;
+
+        /// <summary>
+        /// Porcentaje de error en los ejercicios, predeterminado a 5%
+        /// </summary>
+        private int error = 5;
+
+        /// <summary>
+        /// Array de movimientos (provisional)
+        /// </summary>
+        private bool[] movimiento;
 
         /// <summary>
         /// Width of output drawing
@@ -42,7 +71,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Thickness of drawn joint lines
         /// </summary>
-        private const double JointThickness = 3;
+        private const double JointThickness = 5;
 
         /// <summary>
         /// Thickness of body center ellipse
@@ -241,7 +270,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         if (skel.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             this.DrawBonesAndJoints(skel, dc);
-                            //if()
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
                         {
