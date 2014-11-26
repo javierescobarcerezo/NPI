@@ -58,19 +58,19 @@
             <Run Language="es-es" Text="Based on samples Microsoft Kinnect Co"/>
         </TextBlock>
 
-        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe UI" FontSize="18" Width="996" Height="110" Grid.Row="1">
-            <TextBlock Name="Titulo" Text="P2 Kinnect"/>
-            <LineBreak/>
-			<TextBlock x:Name="Instruccion" Text="Futuras indicaciones" Width="998" Foreground="Purple" FontSize="36" HorizontalAlignment="Center"/>
-			<LineBreak/>
-			<TextBlock x:Name="Descrip_mov" Text="Explicación movimiento" Width="998" Foreground="Blue" FontSize="22"/>
-		</TextBlock>
+        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe UI" FontSize="18" Width="996" Height="110" Grid.Row="1"><InlineUIContainer>
+        		<TextBlock x:Name="Titulo" Text="P2 Kinnect"/>
+        	</InlineUIContainer><LineBreak/><InlineUIContainer>
+        		<TextBlock x:Name="Instruccion" Text="Futuras indicaciones" Width="998" Foreground="Purple" FontSize="36" HorizontalAlignment="Center"/>
+        	</InlineUIContainer><LineBreak/><InlineUIContainer>
+        		<TextBlock x:Name="Descrip_mov" Text="Explicación movimiento" Width="998" Foreground="Blue" FontSize="20" Height="62"/>
+        	</InlineUIContainer></TextBlock>
 
 
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,115,178,119">
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,119">
             <Image x:Name="Image" Width="640" Height="480"/>
         </Viewbox>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,115,178,119">
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,119">
             <Image x:Name="SkeletonImage" Width="640" Height="480"/>
         </Viewbox>
 

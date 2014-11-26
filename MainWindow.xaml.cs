@@ -42,6 +42,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private float mano_derecha;
         private float mano_izquierda;
         private bool escrito = false; //Mientras sea false se puede cambiar un contador
+        private float longitud_brazos;
 
         /// <summary>
         /// Acumulador provisional para asegurar que una postura se mantiene durante un tiempo
@@ -434,6 +435,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         rep = repeticiones;
                         Repeticiones.Text = rep.ToString();
                         Instruccion.Text = "Suba los brazos";
+                        longitud_brazos = skeleton.Joints[JointType.ShoulderRight].Position.Y - skeleton.Joints[JointType.HandRight].Position.Y;
                     }                    
                 }
                 else if (parte2) {                    
@@ -480,6 +482,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                 }
             }
+            Joint punto = skeleton.Joints[JointType.ShoulderRight];
+            punto.Position.Y = punto.Position.Y + longitud_brazos;
+            drawingContext.DrawEllipse(this.trackedJointBrush, null, this.SkeletonPointToScreen(punto.Position), JointThickness, JointThickness);
         }
         /// <summary>
         /// Comprueba si la posición de inicio se realiza correctamente
