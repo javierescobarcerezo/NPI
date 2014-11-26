@@ -58,6 +58,28 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private int error = 5;
 
         /// <summary>
+        /// Si true se realiza este ejercicio
+        /// </summary>
+        private bool ejercicio1 = false;
+
+        /// <summary>
+        /// Si true se realiza este ejercicio
+        /// </summary>
+        private bool ejercicio2 = false;
+
+        /// <summary>
+        /// Si true se realiza este ejercicio
+        /// </summary>
+        private bool ejercicio3 = false;
+
+        private bool parte1;
+
+        /// <summary>
+        /// Número de repeticiones de un ejercicio
+        /// </summary>
+        private int repeticiones = 3;
+
+        /// <summary>
         /// Array de movimientos (provisional)
         /// </summary>
         private bool[] movimiento;
@@ -353,6 +375,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             bool lalala = IsAlignedBodyAndArms(skeleton);
             float distancia = 0.15F;
             Pen drawPenBrazo;
+
+
             /*
             Pen drawPenBrazo;
             float distancia = 0.15F; //distancia que queremos que cubra la mano izquierda
@@ -363,12 +387,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 drawPenBrazo = LeftArmPosition(skeleton, distancia);
             }else
                 drawPenBrazo = penError;*/
-
-            if(lalala){
-                drawPenBrazo = LeftArmPosition(skeleton, distancia);
-            }else
-                drawPenBrazo = penError;
-            
+            /*
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.ShoulderCenter, JointType.ShoulderLeft, drawPen);
@@ -397,6 +416,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, drawPen);
+            */
+
+            if (ejercicio1) {
+
+            }
+
+            //Aquí se añadirían más ejercicios
 
             // Render Joints
             foreach (Joint joint in skeleton.Joints)
