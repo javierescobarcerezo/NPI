@@ -1,4 +1,4 @@
-NPI
+﻿NPI
 ===
 
-Incluye las prácticas de NPI (Nuevos Paradigmas de Interacción)
+Incluye la práctica 2 de NPI (Nuevos Paradigmas de Interacción)

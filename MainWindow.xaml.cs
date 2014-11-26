@@ -349,6 +349,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="drawingContext">drawing context to draw to</param>
         private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
         {
+
+            bool lalala = IsAlignedBodyAndArms(skeleton);
+            float distancia = 0.15F;
+            Pen drawPenBrazo;
+            /*
             Pen drawPenBrazo;
             float distancia = 0.15F; //distancia que queremos que cubra la mano izquierda
             //Primero habrá que completar la posición de inicio (brazos en cruz) antes de continuar
@@ -357,8 +362,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }else if(transcurso){
                 drawPenBrazo = LeftArmPosition(skeleton, distancia);
             }else
-                drawPenBrazo = penError;
+                drawPenBrazo = penError;*/
 
+            if(lalala){
+                drawPenBrazo = LeftArmPosition(skeleton, distancia);
+            }else
+                drawPenBrazo = penError;
             
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter, drawPen);
@@ -499,6 +508,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // We are not using depth directly, but we do want the points in our 640x480 output resolution.
             DepthImagePoint depthPoint = this.sensor.CoordinateMapper.MapSkeletonPointToDepthPoint(skelpoint, DepthImageFormat.Resolution640x480Fps30);
             return new Point(depthPoint.X, depthPoint.Y);
+
+            //ColorImagePoint depthPoint = this.sensor.CoordinateMapper.MapSkeletonPointToColorPoint(skelpoint, ColorImageFormat.RgbResolution640x480Fps30);
+            //return new Point(depthPoint.X, depthPoint.Y);
         }
 
         /// <summary>
@@ -536,6 +548,82 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
+        }
+
+        // boolean method that return true if body is completely aligned and arms are in a relaxed position
+        private bool IsAlignedBodyAndArms(Skeleton received)
+        {
+            double HipCenterPosX = received.Joints[JointType.HipCenter].Position.X;
+            double HipCenterPosY = received.Joints[JointType.HipCenter].Position.Y;
+            double HipCenterPosZ = received.Joints[JointType.HipCenter].Position.Z;
+
+            double ShoulCenterPosX = received.Joints[JointType.ShoulderCenter].Position.X;
+            double ShoulCenterPosY = received.Joints[JointType.ShoulderCenter].Position.Y;
+            double ShoulCenterPosZ = received.Joints[JointType.ShoulderCenter].Position.Z;
+
+            double HeadCenterPosX = received.Joints[JointType.Head].Position.X;
+            double HeadCenterPosY = received.Joints[JointType.Head].Position.Y;
+            double HeadCenterPosZ = received.Joints[JointType.Head].Position.Z;
+
+            double ElbLPosX = received.Joints[JointType.ElbowLeft].Position.X;
+            double ElbLPosY = received.Joints[JointType.ElbowLeft].Position.Y;
+
+            double ElbRPosX = received.Joints[JointType.ElbowRight].Position.X;
+            double ElbRPosY = received.Joints[JointType.ElbowRight].Position.Y;
+
+            double WriLPosX = received.Joints[JointType.WristLeft].Position.X;
+            double WriLPosY = received.Joints[JointType.WristLeft].Position.Y;
+            double WriLPosZ = received.Joints[JointType.WristLeft].Position.Z;
+
+            double WriRPosX = received.Joints[JointType.WristRight].Position.X;
+            double WriRPosY = received.Joints[JointType.WristRight].Position.Y;
+            double WriRPosZ = received.Joints[JointType.WristRight].Position.Z;
+
+            double ShouLPosX = received.Joints[JointType.ShoulderLeft].Position.X;
+            double ShouLPosY = received.Joints[JointType.ShoulderLeft].Position.Y;
+            double ShouLPosZ = received.Joints[JointType.ShoulderLeft].Position.Z;
+
+            double ShouRPosX = received.Joints[JointType.ShoulderRight].Position.X;
+            double ShouRPosY = received.Joints[JointType.ShoulderRight].Position.Y;
+            double ShouRPosZ = received.Joints[JointType.ShoulderRight].Position.Z;
+
+            //have to change to correspond to the 5% error
+            //distance from Shoulder to Wrist for the projection in line with shoulder
+            double distShouLtoWristL = ShouLPosY - WriLPosY;
+            //caldulate admited error 5% that correspond to 9 degrees for each side
+            double radian = (9 * Math.PI) / 180;
+            double DistErrorL = distShouLtoWristL * Math.Tan(radian);
+
+            double distShouLtoWristR = ShouRPosY - WriRPosY;
+            //caldulate admited error 5% that correspond to 9 degrees for each side
+
+            double DistErrorR = distShouLtoWristR * Math.Tan(radian);
+            //double ProjectionWristX = ShouLPosX;
+            //double ProjectionWristZ = WriLPosZ;
+
+            //determine of projected point from shoulder to wrist LEFT and RIGHT and then assume error
+            double ProjectedPointWristLX = ShouLPosX;
+            double ProjectedPointWristLY = WriLPosY;
+            double ProjectedPointWristLZ = ShouLPosZ;
+
+            double ProjectedPointWristRX = ShouRPosX;
+            double ProjectedPointWristRY = WriRPosY;
+            double ProjectedPointWristRZ = ShouRPosZ;
+
+
+            //Create method to verify if the center of the body is completely aligned
+            //head with shoulder center and with hip center
+            if (Math.Abs(HeadCenterPosX - ShoulCenterPosX) <= 0.05 && Math.Abs(ShoulCenterPosX - HipCenterPosX) <= 0.05)
+            {
+                //if position of left wrist is between [ProjectedPointWrist-DistError,ProjectedPointWrist+DistError]
+                if (Math.Abs(WriLPosX - ProjectedPointWristLX) <= DistErrorL && Math.Abs(WriRPosX - ProjectedPointWristRX) <= DistErrorR)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+
         }
 
         /// <summary>
