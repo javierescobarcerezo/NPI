@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Microsoft.Samples.Kinect.SkeletonBasics.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Skeleton Basics" Height="735" Width="770" Loaded="WindowLoaded" Closing="WindowClosing">
+        Title="Skeleton Basics" Height="800" Width="1024" Loaded="WindowLoaded" Closing="WindowClosing">
 
     <Window.Resources>
         <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e"/>
@@ -46,29 +46,47 @@
         </Style>
     </Window.Resources>
 
-    <Grid Name="layoutGrid" Margin="10 0 10 0">
+    <Grid x:Name="layoutGrid" Margin="10 0 10 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" Margin="0 0 0 20">
-            <Image DockPanel.Dock="Left" Source="Images\Logo.png" Stretch="Fill" Height="32" Width="81" Margin="0 10 0 5"/>
-            <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Skeleton Basics</TextBlock>
-            <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
-        </DockPanel>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center">
-            <Image Name="Image" Width="640" Height="480"/>
+
+        <TextBlock x:Name="referencias" HorizontalAlignment="Left">
+            <Run Language="es-es" Text="Based on samples Microsoft Kinnect Co"/>
+        </TextBlock>
+
+        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe UI" FontSize="18" Width="996" Height="110" Grid.Row="1">
+            <TextBlock Name="Titulo" Text="P2 Kinnect"/>
+            <LineBreak/>
+			<TextBlock x:Name="Instruccion" Text="Futuras indicaciones" Width="998" Foreground="Purple" FontSize="36" HorizontalAlignment="Center"/>
+			<LineBreak/>
+			<TextBlock x:Name="Descrip_mov" Text="Explicación movimiento" Width="998" Foreground="Blue" FontSize="22"/>
+		</TextBlock>
+
+
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,115,178,119">
+            <Image x:Name="Image" Width="640" Height="480"/>
         </Viewbox>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center">
-            <Image Name="SkeletonImage" Width="640" Height="534"/>
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,115,178,119">
+            <Image x:Name="SkeletonImage" Width="640" Height="480"/>
         </Viewbox>
-        <CheckBox Grid.Row="2" Style="{StaticResource SquareCheckBox}" Content="Seated Mode" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 10 10 10" Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
-        <StatusBar Grid.Row="3" HorizontalAlignment="Stretch" Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}">
-            <StatusBarItem Padding="0 0 0 10">
-                <TextBlock Name="statusBarText" Margin="-1 0 0 0">Click 'Seated' to change skeletal pipeline type!</TextBlock>
-            </StatusBarItem>
-        </StatusBar>       
+
+
+        <StatusBar Grid.Row="1" x:Name="statusBar"  VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}" Height="81">
+            <Button x:Name="Itinerario1" Content="Itinerario 1" Width="88" Click="Itinerario1_Click" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
+            <Button x:Name="Itinerario2" Content="Itinerario 2" Width="88" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
+            <Button x:Name="Itinerario3" Content="Itinerario 3" Width="88" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
+            <TextBlock Text="Regulador de error" Foreground="Black" Height="23" Margin="43,0,0,0" VerticalAlignment="Top"/>
+            <Slider x:Name="Regulador" Minimum="5" Maximum="30" Value="5" Width="108" Height="25"/>
+            <Label Name="valor_error" Content="5" Width="32"/>
+            <Button Content="Reiniciar" Width="75" Margin="35,0,0,0"/>
+            <CheckBox Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
+            <TextBlock  Text="--" Foreground="Blue" Height="76" Width="271" FontSize="48" TextAlignment="Right"/>
+
+        </StatusBar>
+
     </Grid>
 </Window>

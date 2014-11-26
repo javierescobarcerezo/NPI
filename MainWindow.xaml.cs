@@ -55,7 +55,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Porcentaje de error en los ejercicios, predeterminado a 5%
         /// </summary>
-        private int error = 5;
+        private double error = 5.0;
 
         /// <summary>
         /// Si true se realiza este ejercicio
@@ -72,12 +72,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         private bool ejercicio3 = false;
 
-        private bool parte1;
+        private bool parte1 = true;
+        private bool parte2 = false;
+        private bool parte3 = false;
+
 
         /// <summary>
         /// Número de repeticiones de un ejercicio
         /// </summary>
         private int repeticiones = 3;
+        private int rep = 0;
 
         /// <summary>
         /// Array de movimientos (provisional)
@@ -273,7 +277,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             if (null == this.sensor)
             {
-                this.statusBarText.Text = Properties.Resources.NoKinectReady;
+                this.referencias.Text = Properties.Resources.NoKinectReady;
             }
         }
 
@@ -375,7 +379,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             bool lalala = IsAlignedBodyAndArms(skeleton);
             float distancia = 0.15F;
             Pen drawPenBrazo;
+            int rep;
 
+            error = Regulador.Value;
+            valor_error.Content = error.ToString();
 
             /*
             Pen drawPenBrazo;
@@ -398,9 +405,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.HipCenter, JointType.HipRight, drawPen);
 
             // Left Arm
-            this.DrawBone(skeleton, drawingContext, JointType.ShoulderLeft, JointType.ElbowLeft, drawPenBrazo);
-            this.DrawBone(skeleton, drawingContext, JointType.ElbowLeft, JointType.WristLeft, drawPenBrazo);
-            this.DrawBone(skeleton, drawingContext, JointType.WristLeft, JointType.HandLeft, drawPenBrazo);
+            this.DrawBone(skeleton, drawingContext, JointType.ShoulderLeft, JointType.ElbowLeft, drawPen);
+            this.DrawBone(skeleton, drawingContext, JointType.ElbowLeft, JointType.WristLeft, drawPen);
+            this.DrawBone(skeleton, drawingContext, JointType.WristLeft, JointType.HandLeft, drawPen);
 
             // Right Arm
             this.DrawBone(skeleton, drawingContext, JointType.ShoulderRight, JointType.ElbowRight, drawPen);
@@ -419,7 +426,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             */
 
             if (ejercicio1) {
-
+                Descrip_mov.Text = "Descripción Ejercicio 1";
+                Descrip_mov.Foreground = Brushes.DarkBlue;
+                //Primera parte: comprobamos que estamos en posición de inicio, relajada
+                if (parte1 && IsAlignedBodyAndArms(skeleton))
+                { 
+                    //
+                    parte2 = true;
+                    parte1 = false;
+                }
+                else if (parte2) {
+                    
+                }
             }
 
             //Aquí se añadirían más ejercicios
@@ -653,6 +671,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
+        /// Handler for click event from "Reset Reconstruction" button
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">Event arguments</param>
+        private void Itinerario1_Click(object sender, RoutedEventArgs e) {
+            if (null == this.sensor)
+            {
+                return;
+            }
+            ejercicio1 = true;
+            parte1 = true;
+            Itinerario1.Visibility = Visibility.Hidden;
+            Itinerario2.Visibility = Visibility.Hidden;
+            Itinerario3.Visibility = Visibility.Hidden;
+
+        }
+
+        /// <summary>
         /// Handles the checking or unchecking of the seated mode combo box
         /// </summary>
         /// <param name="sender">object sending the event</param>
@@ -671,5 +707,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
         }
+
     }
 }
