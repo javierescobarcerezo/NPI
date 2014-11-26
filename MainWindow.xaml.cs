@@ -37,10 +37,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         private readonly Pen drawPen = new Pen(Brushes.Blue, 6);
 
-        //Fases de un movimiento
-        private bool inicio = true;
-        private bool transcurso = false;
-        private bool completado = false;
+        //flags
+        private bool mov7 = false;
+        private float mano_derecha;
+        private float mano_izquierda;
 
         /// <summary>
         /// Acumulador provisional para asegurar que una postura se mantiene durante un tiempo
@@ -57,6 +57,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         private double error = 5.0;
 
+        private int n_error = 0;
+
         /// <summary>
         /// Si true se realiza este ejercicio
         /// </summary>
@@ -72,7 +74,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         private bool ejercicio3 = false;
 
-        private bool parte1 = true;
+        private bool parte1 = false;
         private bool parte2 = false;
         private bool parte3 = false;
 
@@ -379,7 +381,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             bool lalala = IsAlignedBodyAndArms(skeleton);
             float distancia = 0.15F;
             Pen drawPenBrazo;
-            int rep;
 
             error = Regulador.Value;
             valor_error.Content = error.ToString();
@@ -394,7 +395,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 drawPenBrazo = LeftArmPosition(skeleton, distancia);
             }else
                 drawPenBrazo = penError;*/
-            /*
+            
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.ShoulderCenter, JointType.ShoulderLeft, drawPen);
@@ -423,20 +424,37 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, drawPen);
-            */
 
             if (ejercicio1) {
-                Descrip_mov.Text = "Descripción Ejercicio 1";
+                Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba los brazos hasta \nponerlos en cruz. Repita ";
                 Descrip_mov.Foreground = Brushes.DarkBlue;
+                Repeticiones.Text = rep.ToString();                
                 //Primera parte: comprobamos que estamos en posición de inicio, relajada
-                if (parte1 && IsAlignedBodyAndArms(skeleton))
-                { 
-                    //
-                    parte2 = true;
-                    parte1 = false;
+                if (parte1)
+                {
+                    
+                    if (IsAlignedBodyAndArms(skeleton)) {
+                        parte2 = true;
+                        parte1 = false;
+                        rep = repeticiones;
+                        Repeticiones.Text = rep.ToString();
+                    }                    
                 }
                 else if (parte2) {
-                    
+                    Instruccion.Text = "Suba los brazos";
+                    switch (movimiento7(skeleton)) {
+                        case 1: rep--;
+                                break;
+                        case -1: Instruccion.Text = "Error"; 
+                                n_error++;
+                                break;
+                    }
+                    if (rep == 0) {
+                        parte2 = false;
+                        parte3 = true;
+                        rep = repeticiones;
+                    }
+                    Repeticiones.Text = rep.ToString();
                 }
             }
 
@@ -467,7 +485,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         /// <param name="skeleton"></param>
         /// <returns></returns>
-        Pen LeftArmInit(Skeleton skeleton)
+        /*Pen LeftArmInit(Skeleton skeleton)
         {
             Pen drawPen;
             if (//Comprueba que el brazo izquierdo esté posicionado correctamente
@@ -503,7 +521,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             else drawPen = penError;
 
             return drawPen;
-        }
+        }*/
 
         /// <summary>
         /// Comprueba el movimiento de la mano izquierda en el eje X se realiza correctamente
@@ -511,7 +529,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="skeleton"></param>
         /// <param name="distancia"></param>
         /// <returns></returns>
-        Pen LeftArmPosition(Skeleton skeleton, float distancia)
+        /*Pen LeftArmPosition(Skeleton skeleton, float distancia)
         {
             Pen drawPen;
             if(completado)
@@ -539,7 +557,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             else drawPen = penTranscurso;
 
             return drawPen;
-        }
+        }*/
 
         /// <summary>
         /// Maps a SkeletonPoint to lie within our render space and converts to Point
@@ -552,9 +570,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // We are not using depth directly, but we do want the points in our 640x480 output resolution.
             DepthImagePoint depthPoint = this.sensor.CoordinateMapper.MapSkeletonPointToDepthPoint(skelpoint, DepthImageFormat.Resolution640x480Fps30);
             return new Point(depthPoint.X, depthPoint.Y);
-
-            //ColorImagePoint depthPoint = this.sensor.CoordinateMapper.MapSkeletonPointToColorPoint(skelpoint, ColorImageFormat.RgbResolution640x480Fps30);
-            //return new Point(depthPoint.X, depthPoint.Y);
         }
 
         /// <summary>
@@ -662,6 +677,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 //if position of left wrist is between [ProjectedPointWrist-DistError,ProjectedPointWrist+DistError]
                 if (Math.Abs(WriLPosX - ProjectedPointWristLX) <= DistErrorL && Math.Abs(WriRPosX - ProjectedPointWristRX) <= DistErrorR)
                 {
+                    mano_derecha = received.Joints[JointType.HandRight].Position.Y;
+                    mano_izquierda = received.Joints[JointType.HandLeft].Position.Y;
                     return true;
                 }
                 else return false;
@@ -706,6 +723,62 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     this.sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
                 }
             }
+        }
+
+        /// <summary>
+        /// Calcula la diferencia entre dos valores.
+        /// </summary>
+        private float diff(float v1, float v2) { return Math.Abs(v1 - v2); }
+
+        /// <summary>
+        /// Movimiento basado en la posicion 7 y 1
+        /// </summary>
+        /// <param name="skel"></param>
+        /// <returns></returns>
+        private int movimiento7(Skeleton skeleton) {
+            double p_error = error / 100;
+            Titulo.Text =  p_error.ToString();
+
+
+            /*if ((mano_derecha * (1.20) > skel.Joints[JointType.HandRight].Position.Y) && !mov7)
+                return -1;
+            if ((mano_izquierda * (1.20) > skel.Joints[JointType.HandLeft].Position.Y) && !mov7)
+                return -1;*/
+
+            //Comprueba que las manos están a la altura de los hombros
+            if (//Comprobamos que se realiza el Movimiento 32
+                //(skeleton.Joints[JointType.HandLeft].Position.X > referencia + distancia) &&
+                //(skeleton.Joints[JointType.HandLeft].Position.X < referencia + distancia + 0.10) &&
+
+                //Comprobamos que los brazos están en cruz
+                    //Comprueba que el brazo izquierdo esté posicionado correctamente
+                (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
+                (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ShoulderLeft].Position.X) &&
+                (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.WristLeft].Position.X) &&
+
+                    //Comprueba que el brazo derecho esté posicionado correctamente
+                (skeleton.Joints[JointType.HandRight].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
+                (skeleton.Joints[JointType.HandRight].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
+                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderRight].Position.X) &&
+                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.WristRight].Position.X) &&
+                    //Comprueba que ambas manos estén al nivel de los hombros
+                (skeleton.Joints[JointType.HandRight].Position.Y * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                (skeleton.Joints[JointType.HandRight].Position.Y * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Y * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Y * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                !mov7
+                )
+            {
+                mov7 = true;
+                Instruccion.Text = "Ahora baje los brazos";
+            }
+            //mano_derecha = skeleton.Joints[JointType.HandRight].Position.Y;
+            //mano_izquierda = skeleton.Joints[JointType.HandLeft].Position.Y;
+            if (mov7 && IsAlignedBodyAndArms(skeleton))
+                return 1;
+            else              
+                return 0;
         }
 
     }

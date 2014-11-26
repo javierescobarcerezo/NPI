@@ -84,7 +84,7 @@
             <Label Name="valor_error" Content="5" Width="32"/>
             <Button Content="Reiniciar" Width="75" Margin="35,0,0,0"/>
             <CheckBox Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
-            <TextBlock  Text="--" Foreground="Blue" Height="76" Width="271" FontSize="48" TextAlignment="Right"/>
+            <TextBlock Name="Repeticiones"  Text="--" Foreground="Blue" Height="76" Width="271" FontSize="48" TextAlignment="Right"/>
 
         </StatusBar>
 
