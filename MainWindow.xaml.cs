@@ -41,6 +41,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private bool mov7 = false;
         private float mano_derecha;
         private float mano_izquierda;
+        private bool escrito = false; //Mientras sea false se puede cambiar un contador
 
         /// <summary>
         /// Acumulador provisional para asegurar que una postura se mantiene durante un tiempo
@@ -377,11 +378,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="drawingContext">drawing context to draw to</param>
         private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
         {
-
-            bool lalala = IsAlignedBodyAndArms(skeleton);
-            float distancia = 0.15F;
-            Pen drawPenBrazo;
-
             error = Regulador.Value;
             valor_error.Content = error.ToString();
 
@@ -431,19 +427,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 Repeticiones.Text = rep.ToString();                
                 //Primera parte: comprobamos que estamos en posición de inicio, relajada
                 if (parte1)
-                {
-                    
-                    if (IsAlignedBodyAndArms(skeleton)) {
+                {                    
+                    if (IsAlignedBodyAndArms(skeleton)){
                         parte2 = true;
                         parte1 = false;
                         rep = repeticiones;
                         Repeticiones.Text = rep.ToString();
+                        Instruccion.Text = "Suba los brazos";
                     }                    
                 }
-                else if (parte2) {
-                    Instruccion.Text = "Suba los brazos";
+                else if (parte2) {                    
                     switch (movimiento7(skeleton)) {
-                        case 1: rep--;
+                        case 1: if (!escrito) {
+                                    rep--;
+                                    Repeticiones.Text = rep.ToString();
+                                    escrito = true;
+                                    mov7 = false;
+                                    Instruccion.Text = "Suba los brazos";
+                                }                                
                                 break;
                         case -1: Instruccion.Text = "Error"; 
                                 n_error++;
@@ -453,8 +454,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         parte2 = false;
                         parte3 = true;
                         rep = repeticiones;
-                    }
-                    Repeticiones.Text = rep.ToString();
+                        Repeticiones.Text = rep.ToString();
+                    }                
                 }
             }
 
@@ -770,6 +771,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 !mov7
                 )
             {
+                escrito = false;
                 mov7 = true;
                 Instruccion.Text = "Ahora baje los brazos";
             }
