@@ -21,28 +21,42 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Pen penCorrecto = new Pen(Brushes.Green, 6);
+        private readonly Pen penVerde = new Pen(Brushes.Green, 6);
         private readonly Brush puntoVerde = Brushes.GreenYellow;
 
-        private readonly Pen penTranscurso = new Pen(Brushes.Yellow, 6);
+        private readonly Pen penAmarillo = new Pen(Brushes.Yellow, 6);
         private readonly Brush puntoAmarillo = Brushes.Yellow;
 
-        private readonly Pen penInicio = new Pen(Brushes.Cyan, 6);
+        private readonly Pen penCyan = new Pen(Brushes.Cyan, 6);
         private readonly Brush puntoCyan = Brushes.Cyan;
 
 
-        private readonly Pen penError = new Pen(Brushes.Red, 6);
+        private readonly Pen penRojo = new Pen(Brushes.Red, 6);
         private readonly Brush puntoRojo = Brushes.Red;
 
 
         private readonly Pen drawPen = new Pen(Brushes.Blue, 6);
 
         //flags
-        private bool mov7 = false;
-        private float mano_derecha;
-        private float mano_izquierda;
+
+        /// <summary>
+        /// Controla si estamos en la fase del ejercicio de levantar los brazos o bajarlos
+        /// </summary>
+        private bool bajar_brazos = false;
+
+        /// <summary>
+        /// Se ha implementado para evitar que se pueda escribir una variable más de una vez en poco tiempo
+        /// </summary>
         private bool escrito = false; //Mientras sea false se puede cambiar un contador
+
+        /// <summary>
+        /// Contiene el valor de la longitud de los brazos del usuario
+        /// </summary>
         private double longitud_brazos= 0;
+
+        /// <summary>
+        /// Variable para controlar qué se pinta y qué no
+        /// </summary>
         private bool pintar= true; //pintar arriba los puntos if true
 
         Point obj_der_sup; //Punto objetivo derecho
@@ -90,8 +104,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Número de repeticiones de un ejercicio
         /// </summary>
-        private int repeticiones = 3;
-        private int rep = 0;
+        private int repeticiones_totales = 3;
+        private int repeticiones = 0;
 
         /// <summary>
         /// Array de movimientos (provisional)
@@ -238,6 +252,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             Image.Source = this.imageSource;
             SkeletonImage.Source = this.imageSource;
 
+
+
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
             // To make your app robust against plug/unplug, 
@@ -310,7 +326,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
         private void SensorColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
-        {
+        {           
+
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 if (colorFrame != null)
@@ -386,7 +403,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
         {
             error = Regulador.Value;
-            //valor_error.Content = error.ToString();
+            valor_error.Content = error.ToString();
 
             Point puntoAux4 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderRight].Position);
             Point puntoAux5 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderLeft].Position);
@@ -420,18 +437,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.DrawBone(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, drawPen);
             this.DrawBone(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, drawPen);*/
 
-            if (ejercicio1) {
-                Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba los brazos hasta \nponerlos en cruz. Repita ";
-                Descrip_mov.Foreground = Brushes.DarkBlue;
-                Repeticiones.Text = rep.ToString();                
+            if (ejercicio1) {                
+                Repeticiones.Text = repeticiones.ToString();                
                 //Primera parte: comprobamos que estamos en posición de inicio, relajada
                 if (parte1)
                 {                    
                     if (IsAlignedBodyAndArms(skeleton)){
                         parte2 = true;
                         parte1 = false;
-                        rep = repeticiones;
-                        Repeticiones.Text = rep.ToString();
+                        repeticiones = repeticiones_totales;
+                        Repeticiones.Text = repeticiones.ToString();
                         Instruccion.Text = "Suba los brazos";
 
                         
@@ -450,7 +465,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     }                    
                 }
                 else if (parte2) {
-                    if (pintar)
+                    if (pintar) //pintar arriba los puntos if true
                     {
                         //Actualizamos los puntos de referencia 
                         obj_der_sup = puntoAux4;
@@ -462,6 +477,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         drawingContext.DrawEllipse(this.trackedJointBrush, null, obj_izq_sup, JointThickness, JointThickness);
                     }
                     else {
+                        //Actualizamos los puntos de referencia 
                         obj_der_inf = puntoAux4;
                         obj_izq_inf = puntoAux5;
                         obj_der_inf.Y = puntoAux4.Y + longitud_brazos;
@@ -471,12 +487,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         drawingContext.DrawEllipse(this.trackedJointBrush, null, obj_der_inf, JointThickness, JointThickness);
                         drawingContext.DrawEllipse(this.trackedJointBrush, null, obj_izq_inf, JointThickness, JointThickness);                        
                     }
-                    switch (movimiento7(skeleton)) {
-                        case 1: if (!escrito) {
-                                    rep--;
-                                    Repeticiones.Text = rep.ToString();
-                                    escrito = true;
-                                    mov7 = false;
+                    switch (ejerc1_parte1(skeleton)) {
+                        case 1: if (!escrito) { // Para controlar que no se actualiza más de una vez repeticiones
+                                    repeticiones--;
+                                    Repeticiones.Text = repeticiones.ToString();
+                                    escrito = true; // Una vez actualizada, se bloquea su acceso
+                                    bajar_brazos = false; // Completada una iteración se cambia el patrón para dibujar las referencias
                                     Instruccion.Text = "Suba los brazos";
                                 }                                
                                 break;
@@ -484,7 +500,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 n_error++;
                                 break;
                     }
-                    if (rep == 0) {
+                    // Si se llega a este punto cambiamos a la siguiente parte del ejercicio
+                    if (repeticiones == 0) {
                         parte2 = false;
                         parte3 = true;
                         //rep = repeticiones;
@@ -497,8 +514,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     Itinerario1.Visibility = Visibility.Visible;
                     Itinerario2.Visibility = Visibility.Visible;
                     Itinerario3.Visibility = Visibility.Visible;
-
-
                 }
             }
 
@@ -524,84 +539,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }*/
         }
-        /// <summary>
-        /// Comprueba si la posición de inicio se realiza correctamente
-        /// </summary>
-        /// <param name="skeleton"></param>
-        /// <returns></returns>
-        /*Pen LeftArmInit(Skeleton skeleton)
-        {
-            Pen drawPen;
-            if (//Comprueba que el brazo izquierdo esté posicionado correctamente
-                (skeleton.Joints[JointType.HandLeft].Position.Z + 0.15 > skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
-                (skeleton.Joints[JointType.HandLeft].Position.Z - 0.15 < skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
-                (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ShoulderLeft].Position.X) &&
-                (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.WristLeft].Position.X) &&
-                //Comprueba que el brazo derecho esté posicionado correctamente
-                (skeleton.Joints[JointType.HandRight].Position.Z + 0.15 > skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
-                (skeleton.Joints[JointType.HandRight].Position.Z - 0.15 < skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
-                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderRight].Position.X) &&
-                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.WristRight].Position.X) &&
-                //Comprueba que ambas manos estén al nivel de los hombros
-                (skeleton.Joints[JointType.HandRight].Position.Y + 0.15 > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                (skeleton.Joints[JointType.HandRight].Position.Y - 0.15 < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                (skeleton.Joints[JointType.HandLeft].Position.Y + 0.15 > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                (skeleton.Joints[JointType.HandLeft].Position.Y - 0.15 < skeleton.Joints[JointType.ShoulderRight].Position.Y)
-                )
-            {
-                drawPen = penInicio;
-                acumulador++; 
-                //Comprobamos que la posición de inicio se ha mantenido durante un tiempo
-                if (acumulador > 100)
-                {
-                    //Posición de inicio alcanzada correctamente
-                    drawPen = penTranscurso; 
-                    inicio = false;
-                    transcurso = true;
-                    //Guardamos la posición de la mano izquierda como referencia para realizar el Movimiento 32
-                    referencia = skeleton.Joints[JointType.HandLeft].Position.X; 
-                }
-            }
-            else drawPen = penError;
-
-            return drawPen;
-        }*/
-
-        /// <summary>
-        /// Comprueba el movimiento de la mano izquierda en el eje X se realiza correctamente
-        /// </summary>
-        /// <param name="skeleton"></param>
-        /// <param name="distancia"></param>
-        /// <returns></returns>
-        /*Pen LeftArmPosition(Skeleton skeleton, float distancia)
-        {
-            Pen drawPen;
-            if(completado)
-                return drawPen = penCorrecto;
-
-            if (//Comprobamos que se realiza el Movimiento 32
-                (skeleton.Joints[JointType.HandLeft].Position.X > referencia + distancia) &&
-                (skeleton.Joints[JointType.HandLeft].Position.X < referencia + distancia + 0.10) &&
-
-                //Comprueba que el brazo derecho esté posicionado correctamente
-                (skeleton.Joints[JointType.HandRight].Position.Z + 0.15 > skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
-                (skeleton.Joints[JointType.HandRight].Position.Z - 0.15 < skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
-                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderRight].Position.X) &&
-                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.WristRight].Position.X) &&
-                //Comprueba que ambas manos estén al nivel de los hombros
-                (skeleton.Joints[JointType.HandRight].Position.Y + 0.15 > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                (skeleton.Joints[JointType.HandRight].Position.Y - 0.15 < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                (skeleton.Joints[JointType.HandLeft].Position.Y + 0.15 > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                (skeleton.Joints[JointType.HandLeft].Position.Y - 0.15 < skeleton.Joints[JointType.ShoulderRight].Position.Y)
-                )
-            {
-                drawPen = penCorrecto; //Movimiento realizado correctamente
-                completado = true;
-            }
-            else drawPen = penTranscurso;
-
-            return drawPen;
-        }*/
 
         /// <summary>
         /// Maps a SkeletonPoint to lie within our render space and converts to Point
@@ -651,9 +588,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
             drawingContext.DrawLine(drawPen, this.SkeletonPointToScreen(joint0.Position), this.SkeletonPointToScreen(joint1.Position));
-        }
+        } 
 
-        // boolean method that return true if body is completely aligned and arms are in a relaxed position
+        /// <summary>
+        /// Boolean method that return true if body is completely aligned and arms are in a relaxed position
+        /// </summary>
+        /// <param name="received"></param>
+        /// <returns></returns>
         private bool IsAlignedBodyAndArms(Skeleton received)
         {
             double HipCenterPosX = received.Joints[JointType.HipCenter].Position.X;
@@ -721,8 +662,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 //if position of left wrist is between [ProjectedPointWrist-DistError,ProjectedPointWrist+DistError]
                 if (Math.Abs(WriLPosX - ProjectedPointWristLX) <= DistErrorL && Math.Abs(WriRPosX - ProjectedPointWristRX) <= DistErrorR)
                 {
-                    mano_derecha = received.Joints[JointType.HandRight].Position.Y;
-                    mano_izquierda = received.Joints[JointType.HandLeft].Position.Y;
                     return true;
                 }
                 else return false;
@@ -732,7 +671,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Handler for click event from "Reset Reconstruction" button
+        /// Handler for click event from "Itinerario1_Click" button
         /// </summary>
         /// <param name="sender">Event sender</param>
         /// <param name="e">Event arguments</param>
@@ -741,12 +680,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 return;
             }
+            Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba los brazos hasta ponerlos en cruz. Repita ";
+            Descrip_mov.Foreground = Brushes.DarkBlue;
             ejercicio1 = true;
             parte1 = true;
             Itinerario1.Visibility = Visibility.Hidden;
             Itinerario2.Visibility = Visibility.Hidden;
             Itinerario3.Visibility = Visibility.Hidden;
-
         }
 
         /// <summary>
@@ -770,31 +710,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Calcula la diferencia entre dos valores.
-        /// </summary>
-        private float diff(float v1, float v2) { return Math.Abs(v1 - v2); }
-
-        /// <summary>
-        /// Movimiento basado en la posicion 7 y 1
+        /// Ejecuta la primera parte del ejercicio 1. Movimiento basado en la posicion 1 y 4
         /// </summary>
         /// <param name="skel"></param>
         /// <returns></returns>
-        private int movimiento7(Skeleton skeleton) {
-            double p_error = error / 100;
-            Titulo.Text =  p_error.ToString();
+        private int ejerc1_parte1(Skeleton skeleton) {
 
+            double p_error = error / 100; // Cambiamos la forma de representar error para usarla más fácilmente
 
+            // Conteo de errores 
             /*if ((mano_derecha * (1.20) > skel.Joints[JointType.HandRight].Position.Y) && !mov7)
                 return -1;
             if ((mano_izquierda * (1.20) > skel.Joints[JointType.HandLeft].Position.Y) && !mov7)
                 return -1;*/
-
-            //Comprueba que las manos están a la altura de los hombros
-            if (//Comprobamos que se realiza el Movimiento 32
-                //(skeleton.Joints[JointType.HandLeft].Position.X > referencia + distancia) &&
-                //(skeleton.Joints[JointType.HandLeft].Position.X < referencia + distancia + 0.10) &&
-
-                //Comprobamos que los brazos están en cruz
+            
+            if (//Comprobamos que los brazos están en cruz
                     //Comprueba que el brazo izquierdo esté posicionado correctamente
                 (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
                 (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
@@ -811,17 +741,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 (skeleton.Joints[JointType.HandRight].Position.Y * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
                 (skeleton.Joints[JointType.HandLeft].Position.Y * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
                 (skeleton.Joints[JointType.HandLeft].Position.Y * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
-                !mov7
+                !bajar_brazos
                 )
             {
-                escrito = false;
-                pintar = false;
-                mov7 = true;
+                escrito = false; // Permitimos que se pueda actualiza la variable repeticiones que lleva las repeticiones
+                pintar = false; // Cambiamos el patrón de pintado, si false se pintaran los puntos de refencia inferiores
+                bajar_brazos = true; // 
                 Instruccion.Text = "Ahora baje los brazos";
             }
-            //mano_derecha = skeleton.Joints[JointType.HandRight].Position.Y;
-            //mano_izquierda = skeleton.Joints[JointType.HandLeft].Position.Y;
-            if (mov7 && IsAlignedBodyAndArms(skeleton))
+            // Si cierto, se toma una repetición del ejercicio como completada y se cambia el patrón de pintado de referencia
+            if (bajar_brazos && IsAlignedBodyAndArms(skeleton))
             {
                 pintar = true;
                 return 1;
