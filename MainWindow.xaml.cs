@@ -386,7 +386,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
         {
             error = Regulador.Value;
-            valor_error.Content = error.ToString();
+            //valor_error.Content = error.ToString();
 
             Point puntoAux4 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderRight].Position);
             Point puntoAux5 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderLeft].Position);
