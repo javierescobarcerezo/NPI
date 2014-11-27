@@ -42,7 +42,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private float mano_derecha;
         private float mano_izquierda;
         private bool escrito = false; //Mientras sea false se puede cambiar un contador
-        private float longitud_brazos;
+        private float longitud_brazos= 0;
 
         /// <summary>
         /// Acumulador provisional para asegurar que una postura se mantiene durante un tiempo
@@ -380,7 +380,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
         {
             error = Regulador.Value;
-            valor_error.Content = error.ToString();
+            valor_error.Content = longitud_brazos.ToString();//error.ToString();
 
             /*
             Pen drawPenBrazo;
@@ -482,9 +482,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                 }
             }
-            Joint punto = skeleton.Joints[JointType.ShoulderRight];
-            punto.Position.Y = punto.Position.Y + longitud_brazos;
-            drawingContext.DrawEllipse(this.trackedJointBrush, null, this.SkeletonPointToScreen(punto.Position), JointThickness, JointThickness);
+            Point punto1 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderRight].Position);
+            Point punto2 = this.SkeletonPointToScreen(skeleton.Joints[JointType.HandRight].Position);
+            punto1.X = punto1.X + Math.Abs(punto2.Y-punto1.Y);
+            drawingContext.DrawEllipse(this.trackedJointBrush, null, punto1, JointThickness, JointThickness);
         }
         /// <summary>
         /// Comprueba si la posición de inicio se realiza correctamente
