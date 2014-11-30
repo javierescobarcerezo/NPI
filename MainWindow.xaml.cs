@@ -399,9 +399,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             if (ejercicio1) {
                 itinerario1(skeleton, drawingContext);
-            }            
-
-            //Aquí se añadirían más ejercicios
+            }
+            if (ejercicio2)
+            {
+                itinerario2(skeleton, drawingContext);
+            }
+            if (ejercicio3)
+            {
+                itinerario3(skeleton, drawingContext);
+            }
 
             
         }
@@ -537,31 +543,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Handler for click event from "Itinerario1_Click" button
-        /// </summary>
-        /// <param name="sender">Event sender</param>
-        /// <param name="e">Event arguments</param>
-        private void Itinerario1_Click(object sender, RoutedEventArgs e) {
-            /*if (null == this.sensor)
-            {
-                return;
-            }*/
-            Instruccion.Text = "Colócate delante de la cámara relajado con los brazos pegados al cuerpo";
-            Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba los brazos hasta ponerlos en cruz. Repita ";
-            Descrip_mov.Foreground = Brushes.DarkBlue;
-            ejercicio1 = true;
-            parte1 = true;
-            //Hacemos desaparecer los botones que no interesan
-            Itinerario1.Visibility = Visibility.Hidden;
-            Itinerario2.Visibility = Visibility.Hidden;
-            Itinerario3.Visibility = Visibility.Hidden;
-            plus.Visibility = Visibility.Hidden;
-            minus.Visibility = Visibility.Hidden;
-            Num_repeticiones.Visibility = Visibility.Hidden;
-            Texto_intentos.Visibility = Visibility.Hidden;
-        }
-
-        /// <summary>
         /// Handles the checking or unchecking of the seated mode combo box
         /// </summary>
         /// <param name="sender">object sending the event</param>
@@ -624,6 +605,110 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 pintar = false; // Cambiamos el patrón de pintado, si false se pintaran los puntos de refencia inferiores
                 bajar_brazos = true; // Ahora deben bajarse los brazos
                 Instruccion.Text = "Ahora baje los brazos";
+            }
+            // Si cierto, se toma una iteración del ejercicio como completada y se cambia el patrón de pintado de referencia
+            if (bajar_brazos && IsAlignedBodyAndArms(skeleton))
+            {
+                pintar = true;
+                return 1;
+            }
+            else
+                return 0;
+        }
+
+        /// <summary>
+        /// Ejecuta el ejercicio 2. Mancuernas con el brazo derecho
+        /// </summary>
+        /// <param name="skeleton"></param>
+        /// <returns></returns>
+        private int ejerc2(Skeleton skeleton)
+        {
+
+            double p_error = error / 100; // Cambiamos la forma de representar error para usarla más fácilmente
+
+            // Conteo de errores 
+            /*if ((mano_derecha * (1.20) > skeleton.Joints[JointType.HandRight].Position.Y) && !bajar_brazos)
+            {
+                return -1;
+            }
+            if ((mano_izquierda * (1.20) > skeleton.Joints[JointType.HandLeft].Position.Y) && !bajar_brazos)
+            {
+                return -1;
+            }*/
+
+            if (//Comprueba que el brazo izquierdo esté pegado al cuerpo
+                (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.ShoulderLeft].Position.Y) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.WristLeft].Position.Y) &&
+
+                 //Comprueba que el brazo derecho esté posicionado correctamente
+                (skeleton.Joints[JointType.HandRight].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
+                (skeleton.Joints[JointType.HandRight].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
+                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderRight].Position.X) &&
+                (skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.WristRight].Position.X) &&
+                //Comprueba que la mano derecha esté al nivel de los hombros
+                (skeleton.Joints[JointType.HandRight].Position.Y * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                (skeleton.Joints[JointType.HandRight].Position.Y * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                !bajar_brazos
+                )
+            {
+                escrito = false; // Permitimos que se pueda actualiza la variable repeticiones que lleva las repeticiones
+                pintar = false; // Cambiamos el patrón de pintado, si false se pintaran los puntos de refencia inferiores
+                bajar_brazos = true; // Ahora debe bajarse el brazo derecho
+                Instruccion.Text = "Ahora baje el brazo derecho";
+            }
+            // Si cierto, se toma una iteración del ejercicio como completada y se cambia el patrón de pintado de referencia
+            if (bajar_brazos && IsAlignedBodyAndArms(skeleton))
+            {
+                pintar = true;
+                return 1;
+            }
+            else
+                return 0;
+        }
+
+        /// <summary>
+        /// Ejecuta el ejercicio 3. Mancuernas con el brazo izquierdo
+        /// </summary>
+        /// <param name="skeleton"></param>
+        /// <returns></returns>
+        private int ejerc3(Skeleton skeleton)
+        {
+
+            double p_error = error / 100; // Cambiamos la forma de representar error para usarla más fácilmente
+
+            // Conteo de errores 
+            /*if ((mano_derecha * (1.20) > skeleton.Joints[JointType.HandRight].Position.Y) && !bajar_brazos)
+            {
+                return -1;
+            }
+            if ((mano_izquierda * (1.20) > skeleton.Joints[JointType.HandLeft].Position.Y) && !bajar_brazos)
+            {
+                return -1;
+            }*/
+
+            if (//Comprueba que el brazo derecho esté pegado al cuerpo
+                (skeleton.Joints[JointType.HandRight].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
+                (skeleton.Joints[JointType.HandRight].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderRight].Position.Z) &&
+                (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderRight].Position.Y) &&
+                (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.WristRight].Position.Y) &&
+
+                 //Comprueba que el brazo izquierdo esté posicionado correctamente
+                (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Z * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderLeft].Position.Z) &&
+                (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ShoulderLeft].Position.X) &&
+                (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.WristLeft].Position.X) &&
+                //Comprueba que la mano izquierda esté al nivel de los hombros
+                (skeleton.Joints[JointType.HandLeft].Position.Y * (1.0 + p_error) > skeleton.Joints[JointType.ShoulderLeft].Position.Y) &&
+                (skeleton.Joints[JointType.HandLeft].Position.Y * (1.0 - p_error) < skeleton.Joints[JointType.ShoulderLeft].Position.Y) &&
+                !bajar_brazos
+                )
+            {
+                escrito = false; // Permitimos que se pueda actualiza la variable repeticiones que lleva las repeticiones
+                pintar = false; // Cambiamos el patrón de pintado, si false se pintaran los puntos de refencia inferiores
+                bajar_brazos = true; // Ahora debe bajarse el brazo izquierdo
+                Instruccion.Text = "Ahora baje el brazo izquierdo";
             }
             // Si cierto, se toma una iteración del ejercicio como completada y se cambia el patrón de pintado de referencia
             if (bajar_brazos && IsAlignedBodyAndArms(skeleton))
@@ -718,6 +803,182 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     Instruccion.Text = "Fin del Itinerario 1. Perfecto!";
                     ejercicio1 = false;
+                    Itinerario1.Visibility = Visibility.Visible;
+                    Itinerario2.Visibility = Visibility.Visible;
+                    Itinerario3.Visibility = Visibility.Visible;
+
+                    plus.Visibility = Visibility.Visible;
+                    minus.Visibility = Visibility.Visible;
+                    Num_repeticiones.Visibility = Visibility.Visible;
+                    Texto_intentos.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ejecuta el itinerario 2
+        /// </summary>
+        /// <param name="skeleton"></param>
+        /// <param name="drawingContext"></param>
+        private void itinerario2(Skeleton skeleton, DrawingContext drawingContext)
+        {
+            Point puntoAux4 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderRight].Position);
+
+            if (ejercicio2)
+            {
+                Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                //Primera parte: comprobamos que estamos en posición de inicio, relajada
+                if (parte1)
+                {
+                    if (IsAlignedBodyAndArms(skeleton))
+                    {
+                        parte2 = true;
+                        parte1 = false;
+                        repeticiones = repeticiones_totales;
+                        Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                        Instruccion.Text = "Suba el brazo derecho";
+
+                        // En esta parte se calcula la longitud de los brazos del usuario 
+                        calcular_longitud_brazos(skeleton);
+                    }
+                }
+                // Segunda parte: levantar mancuernas con ambos brazos en el eje XY
+                else if (parte2)
+                {
+                    if (pintar) // Si cierto pintar los puntos de referencia superiores
+                    {
+                        //Actualizamos los puntos de referencia 
+                        obj_der_sup = puntoAux4;
+                        obj_der_sup.X = puntoAux4.X + longitud_brazos;
+
+                        //Pintamos los puntos de referencia
+                        pintar_punto(this.trackedJointBrush, obj_der_sup, drawingContext);
+                    }
+                    else
+                    {
+                        //Actualizamos los puntos de referencia 
+                        obj_der_inf = puntoAux4;
+                        obj_der_inf.Y = puntoAux4.Y + longitud_brazos;
+
+                        //Pintamos los puntos de referencia
+                        pintar_punto(this.trackedJointBrush, obj_der_inf, drawingContext);
+                    }
+                    switch (ejerc2(skeleton))
+                    {
+                        case 1: if (!escrito) // Para controlar que no se actualiza más de una vez $repeticiones
+                            {
+                                repeticiones--;
+                                Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                                escrito = true; // Una vez actualizada, se bloquea su acceso
+                                bajar_brazos = false; // Ahora debe subirse el brazo derecho
+                                Instruccion.Text = "Suba el brazo derecho";
+                            }
+                            break;
+                        case -1: Instruccion.Text = "Error";
+                            n_error++;
+                            break;
+                    }
+                    // Si se llega a este punto cambiamos a la siguiente parte del ejercicio
+                    if (repeticiones == 0)
+                    {
+                        parte2 = false;
+                        parte3 = true;
+                        repeticiones = repeticiones_totales;
+                        Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                    }
+                }
+                else if (parte3)
+                {
+                    Instruccion.Text = "Fin del Itinerario 2. Perfecto!";
+                    ejercicio2 = false;
+                    Itinerario1.Visibility = Visibility.Visible;
+                    Itinerario2.Visibility = Visibility.Visible;
+                    Itinerario3.Visibility = Visibility.Visible;
+
+                    plus.Visibility = Visibility.Visible;
+                    minus.Visibility = Visibility.Visible;
+                    Num_repeticiones.Visibility = Visibility.Visible;
+                    Texto_intentos.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ejecuta el itinerario 3
+        /// </summary>
+        /// <param name="skeleton"></param>
+        /// <param name="drawingContext"></param>
+        private void itinerario3(Skeleton skeleton, DrawingContext drawingContext)
+        {
+            Point puntoAux5 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderLeft].Position);
+
+            if (ejercicio3)
+            {
+                Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                //Primera parte: comprobamos que estamos en posición de inicio, relajada
+                if (parte1)
+                {
+                    if (IsAlignedBodyAndArms(skeleton))
+                    {
+                        parte2 = true;
+                        parte1 = false;
+                        repeticiones = repeticiones_totales;
+                        Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                        Instruccion.Text = "Suba el brazo isquierdo";
+
+                        // En esta parte se calcula la longitud de los brazos del usuario 
+                        calcular_longitud_brazos(skeleton);
+                    }
+                }
+                // Segunda parte: levantar mancuernas con ambos brazos en el eje XY
+                else if (parte2)
+                {
+                    if (pintar) // Si cierto pintar los puntos de referencia superiores
+                    {
+                        //Actualizamos los puntos de referencia
+                        obj_izq_sup = puntoAux5;
+                        obj_izq_sup.X = puntoAux5.X - longitud_brazos;
+
+                        //Pintamos los puntos de referencia
+                        pintar_punto(this.trackedJointBrush, obj_izq_sup, drawingContext);
+                    }
+                    else
+                    {
+                        //Actualizamos los puntos de referencia 
+                        obj_izq_inf = puntoAux5;
+                        obj_izq_inf.Y = puntoAux5.Y + longitud_brazos;
+
+                        //Pintamos los puntos de referencia
+                        pintar_punto(this.trackedJointBrush, obj_izq_inf, drawingContext);
+                    }
+                    switch (ejerc3(skeleton))
+                    {
+                        case 1: if (!escrito) // Para controlar que no se actualiza más de una vez $repeticiones
+                            {
+                                repeticiones--;
+                                Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                                escrito = true; // Una vez actualizada, se bloquea su acceso
+                                bajar_brazos = false; // Ahora debe subirse el brazo izquierdo
+                                Instruccion.Text = "Suba el brazo izquierdo";
+                            }
+                            break;
+                        case -1: Instruccion.Text = "Error";
+                            n_error++;
+                            break;
+                    }
+                    // Si se llega a este punto cambiamos a la siguiente parte del ejercicio
+                    if (repeticiones == 0)
+                    {
+                        parte2 = false;
+                        parte3 = true;
+                        repeticiones = repeticiones_totales;
+                        Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
+                    }
+                }
+                else if (parte3)
+                {
+                    Instruccion.Text = "Fin del Itinerario 3. Perfecto!";
+                    ejercicio3 = false;
                     Itinerario1.Visibility = Visibility.Visible;
                     Itinerario2.Visibility = Visibility.Visible;
                     Itinerario3.Visibility = Visibility.Visible;
@@ -836,6 +1097,76 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             minus.Visibility = Visibility.Visible;
             Num_repeticiones.Visibility = Visibility.Visible;
             Texto_intentos.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// Handler for click event from "Itinerario1_Click" button
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">Event arguments</param>
+        private void Itinerario1_Click(object sender, RoutedEventArgs e)
+        {
+            /*if (null == this.sensor)
+            {
+                return;
+            }*/
+            Instruccion.Text = "Colócate delante de la cámara relajado con los brazos pegados al cuerpo";
+            Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba los brazos hasta ponerlos en cruz. Repita ";
+            Descrip_mov.Foreground = Brushes.DarkBlue;
+            ejercicio1 = true;
+            parte1 = true;
+            //Hacemos desaparecer los botones que no interesan
+            Itinerario1.Visibility = Visibility.Hidden;
+            Itinerario2.Visibility = Visibility.Hidden;
+            Itinerario3.Visibility = Visibility.Hidden;
+            plus.Visibility = Visibility.Hidden;
+            minus.Visibility = Visibility.Hidden;
+            Num_repeticiones.Visibility = Visibility.Hidden;
+            Texto_intentos.Visibility = Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// Handler for click event from "Itinerario2_Click" button
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">Event arguments</param>
+        private void Itinerario2_Click(object sender, RoutedEventArgs e)
+        {
+            Instruccion.Text = "Colócate delante de la cámara relajado con los brazos pegados al cuerpo";
+            Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba el brazo derecho hasta la altura de los hombros. Repita ";
+            Descrip_mov.Foreground = Brushes.DarkBlue;
+            ejercicio2 = true;
+            parte1 = true;
+            //Hacemos desaparecer los botones que no interesan
+            Itinerario1.Visibility = Visibility.Hidden;
+            Itinerario2.Visibility = Visibility.Hidden;
+            Itinerario3.Visibility = Visibility.Hidden;
+            plus.Visibility = Visibility.Hidden;
+            minus.Visibility = Visibility.Hidden;
+            Num_repeticiones.Visibility = Visibility.Hidden;
+            Texto_intentos.Visibility = Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// Handler for click event from "Itinerario3_Click" button
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="e">Event arguments</param>
+        private void Itinerario3_Click(object sender, RoutedEventArgs e)
+        {
+            Instruccion.Text = "Colócate delante de la cámara relajado con los brazos pegados al cuerpo";
+            Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba el brazo izquierdo hasta la altura de los hombros. Repita ";
+            Descrip_mov.Foreground = Brushes.DarkBlue;
+            ejercicio3 = true;
+            parte1 = true;
+            //Hacemos desaparecer los botones que no interesan
+            Itinerario1.Visibility = Visibility.Hidden;
+            Itinerario2.Visibility = Visibility.Hidden;
+            Itinerario3.Visibility = Visibility.Hidden;
+            plus.Visibility = Visibility.Hidden;
+            minus.Visibility = Visibility.Hidden;
+            Num_repeticiones.Visibility = Visibility.Hidden;
+            Texto_intentos.Visibility = Visibility.Hidden;
         }
 
     }

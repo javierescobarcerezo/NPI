@@ -82,8 +82,8 @@
 
         <StatusBar Grid.Row="1" x:Name="statusBar"  VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}" Height="81">
             <Button x:Name="Itinerario1" Content="Itinerario 1" Width="88" Click="Itinerario1_Click" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
-            <Button x:Name="Itinerario2" Content="Itinerario 2" Width="88" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
-            <Button x:Name="Itinerario3" Content="Itinerario 3" Width="88" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
+            <Button x:Name="Itinerario2" Content="Itinerario 2" Width="88" Click="Itinerario2_Click" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
+            <Button x:Name="Itinerario3" Content="Itinerario 3" Width="88" Click="Itinerario3_Click" Visibility="Visible" RenderTransformOrigin="0.453,-2.05"/>
             <TextBlock Text="Regulador de error" Foreground="Black" Height="23" Margin="43,0,0,0" VerticalAlignment="Top"/>
             <Slider x:Name="Regulador" Minimum="5" Maximum="30" Value="5" Width="108" Height="25"/>
             <Label Name="valor_error" Content="5" Width="32"/>
