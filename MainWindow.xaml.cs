@@ -65,20 +65,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         Point obj_izq_inf; //Punto objetivo izquierdo
 
         /// <summary>
-        /// Acumulador provisional para asegurar que una postura se mantiene durante un tiempo
-        /// </summary>
-        private int acumulador = 0;
-
-        /// <summary>
-        /// Variable para guardar puntos de referencia (provisional)
-        /// </summary>
-        private float referencia;
-
-        /// <summary>
         /// Porcentaje de error en los ejercicios, predeterminado a 5%
         /// </summary>
         private double error = 5.0;
 
+        /// <summary>
+        /// Contador de errores
+        /// </summary>
         private int n_error = 0;
 
         /// <summary>
@@ -96,21 +89,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         private bool ejercicio3 = false;
 
+        //Muestran en qué parte del ejercicio estamos
         private bool parte1 = false;
         private bool parte2 = false;
         private bool parte3 = false;
+        private bool parte4 = false;
 
 
         /// <summary>
-        /// Número de repeticiones de un ejercicio
+        /// Número de repeticiones totales de un ejercicio
         /// </summary>
         private int repeticiones_totales = 3;
-        private int repeticiones = 0;
 
         /// <summary>
-        /// Array de movimientos (provisional)
+        /// Lleva la cuenta actual de repeticiones por hacer hasta finalizar el ejercicio
         /// </summary>
-        private bool[] movimiento;
+        private int repeticiones = 0;
 
         /// <summary>
         /// Bitmap that will hold color information
@@ -250,9 +244,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Display the drawing using our image control
             Image.Source = this.imageSource;
+            // Donde se pintan los puntos de referencia y el skeleton
             SkeletonImage.Source = this.imageSource;
-
-
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -326,7 +319,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
         private void SensorColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
-        {           
+        {
+            error = Regulador.Value;
+            valor_error.Content = error.ToString();
 
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
@@ -402,33 +397,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="drawingContext">drawing context to draw to</param>
         private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
         {
-
             if (ejercicio1) {
                 itinerario1(skeleton, drawingContext);
-            }
-            
+            }            
 
             //Aquí se añadirían más ejercicios
 
-            /*// Render Joints
-            foreach (Joint joint in skeleton.Joints)
-            {
-                Brush drawBrush = null;
-
-                if (joint.TrackingState == JointTrackingState.Tracked)
-                {
-                    drawBrush = this.trackedJointBrush;
-                }
-                else if (joint.TrackingState == JointTrackingState.Inferred)
-                {
-                    drawBrush = this.inferredJointBrush;
-                }
-
-                if (drawBrush != null)
-                {
-                    drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
-                }
-            }*/
+            
         }
 
         /// <summary>
@@ -567,17 +542,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="sender">Event sender</param>
         /// <param name="e">Event arguments</param>
         private void Itinerario1_Click(object sender, RoutedEventArgs e) {
-            if (null == this.sensor)
+            /*if (null == this.sensor)
             {
                 return;
-            }
+            }*/
+            Instruccion.Text = "Colócate delante de la cámara relajado con los brazos pegados al cuerpo";
             Descrip_mov.Text = "Póngase en posición relajada y los brazos pegados al cuerpo. A continuación suba los brazos hasta ponerlos en cruz. Repita ";
             Descrip_mov.Foreground = Brushes.DarkBlue;
             ejercicio1 = true;
             parte1 = true;
+            //Hacemos desaparecer los botones que no interesan
             Itinerario1.Visibility = Visibility.Hidden;
             Itinerario2.Visibility = Visibility.Hidden;
             Itinerario3.Visibility = Visibility.Hidden;
+            plus.Visibility = Visibility.Hidden;
+            minus.Visibility = Visibility.Hidden;
+            Num_repeticiones.Visibility = Visibility.Hidden;
+            Texto_intentos.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
@@ -661,10 +642,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="drawingContext"></param>
         private void itinerario1(Skeleton skeleton, DrawingContext drawingContext)
         {
-
-            error = Regulador.Value;
-            valor_error.Content = error.ToString();
-
             Point puntoAux4 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderRight].Position);
             Point puntoAux5 = this.SkeletonPointToScreen(skeleton.Joints[JointType.ShoulderLeft].Position);
 
@@ -673,7 +650,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 Repeticiones.Text = repeticiones.ToString(); // Mostramos las repeticiones actuales a hacer por pantalla
                 //Primera parte: comprobamos que estamos en posición de inicio, relajada
                 if (parte1)
-                {
+                {                    
                     if (IsAlignedBodyAndArms(skeleton))
                     {
                         parte2 = true;
@@ -744,6 +721,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     Itinerario1.Visibility = Visibility.Visible;
                     Itinerario2.Visibility = Visibility.Visible;
                     Itinerario3.Visibility = Visibility.Visible;
+
+                    plus.Visibility = Visibility.Visible;
+                    minus.Visibility = Visibility.Visible;
+                    Num_repeticiones.Visibility = Visibility.Visible;
+                    Texto_intentos.Visibility = Visibility.Visible;
                 }
             }
         }
@@ -779,6 +761,81 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void pintar_punto(Brush brush, Point point, DrawingContext drawingContext)
         {
             drawingContext.DrawEllipse(brush, null, point, JointThickness, JointThickness);
+        }
+
+        /// <summary>
+        /// Controla el comportamiento de el botón más '+'
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void plus_Click(object sender, RoutedEventArgs e)
+        {
+            if (null == this.sensor)
+            {
+                return;
+            }
+
+            repeticiones_totales++;
+            Num_repeticiones.Content = repeticiones_totales.ToString();
+        }
+
+        /// <summary>
+        /// Controla el comportamiento de el botón menos '-'
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void minus_Click(object sender, RoutedEventArgs e)
+        {
+            if (null == this.sensor)
+            {
+                return;
+            }
+
+            if (repeticiones_totales != 1)
+                repeticiones_totales--;
+            Num_repeticiones.Content = repeticiones_totales.ToString();
+        }
+
+        /// <summary>
+        /// Controla el comportamiento de el botón reiniciar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Reiniciar_Click(object sender, RoutedEventArgs e)
+        {
+            if (null == this.sensor)
+            {
+                return;
+            }
+            // Actualizamos variables globales
+            ejercicio1 = false;
+            ejercicio2 = false;
+            ejercicio3 = false;
+            repeticiones_totales = 3;
+            parte1 = false;
+            parte2 = false;
+            parte3 = false;
+            parte4 = false;
+            bajar_brazos = false;
+            escrito = false;
+            n_error = 0;
+            error = 5.0;
+
+            // Actualizamos información por pantalla
+            valor_error.Content = error.ToString();
+            Regulador.Value = 5;
+            Num_repeticiones.Content = repeticiones_totales.ToString();
+            Instruccion.Text = "Ajuste los valores de configuración";
+            Descrip_mov.Text = " ";
+
+            Itinerario1.Visibility = Visibility.Visible;
+            Itinerario2.Visibility = Visibility.Visible;
+            Itinerario3.Visibility = Visibility.Visible;
+
+            plus.Visibility = Visibility.Visible;
+            minus.Visibility = Visibility.Visible;
+            Num_repeticiones.Visibility = Visibility.Visible;
+            Texto_intentos.Visibility = Visibility.Visible;
         }
 
     }

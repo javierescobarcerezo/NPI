@@ -58,21 +58,26 @@
             <Run Language="es-es" Text="Based on samples Microsoft Kinnect Co"/>
         </TextBlock>
 
-        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe UI" FontSize="18" Width="996" Height="110" Grid.Row="1"><InlineUIContainer>
+        <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe UI" FontSize="18" Width="1328" Height="110" Grid.Row="1"><InlineUIContainer>
         		<TextBlock x:Name="Titulo" Text="P2 Kinnect"/>
         	</InlineUIContainer><LineBreak/><InlineUIContainer>
-        		<TextBlock x:Name="Instruccion" Text="Futuras indicaciones" Width="1331" Foreground="Purple" FontSize="36" HorizontalAlignment="Left"/>
+        		<TextBlock x:Name="Instruccion" Text="Ajuste los valores de configuración" Width="1343" Foreground="Purple" FontSize="36" HorizontalAlignment="Left"/>	
         	</InlineUIContainer><LineBreak/><InlineUIContainer>
-        		<TextBlock x:Name="Descrip_mov" Text="Explicación movimiento" Width="1343" Foreground="Blue" FontSize="20" Height="62"/>
+        		<TextBlock x:Name="Descrip_mov" Text="" Width="1343" Foreground="Blue" FontSize="20" Height="62"/>
         	</InlineUIContainer></TextBlock>
 
 
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,119">
-            <Image x:Name="Image" Width="640" Height="480"/>
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,80">
+            <Image x:Name="Image" Width="1034" Height="518"/>
         </Viewbox>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,119">
-            <Image x:Name="SkeletonImage" Width="640" Height="480"/>
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,80">
+            <Image x:Name="SkeletonImage" Width="1034" Height="518"/>
         </Viewbox>
+
+        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center" Margin="178,145,178,80">
+            <Image x:Name="Image2" Width="1034" Height="518"/>
+        </Viewbox>
+
 
 
         <StatusBar Grid.Row="1" x:Name="statusBar"  VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}" Height="81">
@@ -82,10 +87,13 @@
             <TextBlock Text="Regulador de error" Foreground="Black" Height="23" Margin="43,0,0,0" VerticalAlignment="Top"/>
             <Slider x:Name="Regulador" Minimum="5" Maximum="30" Value="5" Width="108" Height="25"/>
             <Label Name="valor_error" Content="5" Width="32"/>
-            <Button Content="Reiniciar" Width="75" Margin="35,0,0,0"/>
+            <Button x:Name="Reiniciar" Click="Reiniciar_Click" Content="Reiniciar" Width="75" Margin="35,0,0,0"/>
             <CheckBox Name="checkBoxSeatedMode" Checked="CheckBoxSeatedModeChanged" Unchecked="CheckBoxSeatedModeChanged"/>
+            <TextBlock Height="19" Name="Texto_intentos" Text="Ajustar número de intentos" Foreground="Black" Margin="43,0,0,0" VerticalAlignment="Top" Width="150"/>
+            <Button x:Name="plus" Click="plus_Click" FontSize="22" Content="+" Width="29" Height="37" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Label FontSize="22" Name="Num_repeticiones" Content="3" Height="40"/>
+            <Button x:Name="minus" Click="minus_Click" FontSize="24" Content="-" Width="29" Height="37"/>
             <TextBlock Name="Repeticiones"  Text="--" Foreground="Blue" Height="76" Width="134" FontSize="48" TextAlignment="Right"/>
-
         </StatusBar>
 
     </Grid>
